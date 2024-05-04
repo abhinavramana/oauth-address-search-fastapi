@@ -6,6 +6,7 @@ from trie_node import add_to_trie, TrieNode
 
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 ZIP_CODE_DATA = {}
@@ -29,10 +30,11 @@ def process_record(row):
         latitude=latitude,
         longitude=longitude,
     )
+    logger.info(f"Adding {city} to trie")
     add_to_trie(TRIE, city, ZIP_CODE_DATA[zip_code])
 
 
-async def perform_bootup(filename:str):
+async def perform_bootup(filename: str):
     with open(filename, "r") as file:
         reader = csv.reader(file)
         for row in reader:

@@ -13,3 +13,7 @@ class ZipCodeData(BaseModel):
 
 class MatchedZipCode(ZipCodeData):
     score: int
+
+
+class SortedCityMatch(BaseModel):
+    city: str

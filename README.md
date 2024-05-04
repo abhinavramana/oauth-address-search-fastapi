@@ -22,24 +22,22 @@ From here on, all instructions will be based on the assumption that you have met
 
 Open a terminal or command prompt, and run the following command to start the FastAPI server:
 ```bash
-uvicorn application:app --reload
+uvicorn application:app --reload --log-level info --port 8002
 ```
 
 ## Testing the application
 
 Once the server is running, you can access the API endpoints using a tool like cURL or by sending HTTP requests from your application.
 The 2 endpoints that are available are:
-1. To retrieve zip code data for a specific zip code, send a GET request to http://localhost:8000/zip/{zip_code}, replacing {zip_code} with the desired zip code.
-2. To match a city name and retrieve the top 3 closest zip codes, send a POST request to http://localhost:8000/match with a JSON payload containing the city field. For example:
-```json
-{
-  "city": "Cheyenne"
-}
+1. To retrieve zip code data for a specific zip code, send a GET request to http://localhost:8002/zip/{zip_code}, replacing {zip_code} with the desired zip code.
+2. To match a city name and retrieve the top 3 closest zip codes, send a POST request to http://localhost:8002/match with a JSON payload containing the city field. For example:
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{"city": "Cheyenne"}' http://localhost:8002/match
 ```
 
 ## Auto-generated API documentation
 
-You can also access the FastAPI automatic documentation by visiting http://localhost:8000/docs in your web browser. It provides an interactive interface to explore and test the API endpoints.
+You can also access the FastAPI automatic documentation by visiting http://localhost:8002/docs in your web browser. It provides an interactive interface to explore and test the API endpoints.
 
 ## Code structure
 **Python files:**
