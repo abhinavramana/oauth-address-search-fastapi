@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+
 class ZipCodeData(BaseModel):
     zip_code: str
     city: str

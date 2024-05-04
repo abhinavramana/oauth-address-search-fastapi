@@ -1,0 +1,2 @@
+ZIP_CSV_FILE = "zips.csv"
+NUM_CITY_MATCHES = 3

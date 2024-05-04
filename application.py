@@ -1,9 +1,11 @@
-from bootup import ZIP_CODE_DATA, perform_bootup
+from bootup import ZIP_CODE_DATA, perform_bootup, TRIE
 from fastapi import FastAPI
 from typing import List
 import logging
 
+from config import ZIP_CSV_FILE, NUM_CITY_MATCHES
 from models import MatchedZipCode
+from trie_node import search_trie
 
 app = FastAPI()
 logging.info("API ready to serve requests...")
@@ -12,7 +14,7 @@ logging.info("API ready to serve requests...")
 @app.on_event("startup")
 async def startup_event():
     logging.info("Performing bootup...")
-    await perform_bootup("zips.csv")
+    await perform_bootup(ZIP_CSV_FILE)
 
 
 @app.get("/zip/{zip_code}")
@@ -25,4 +27,6 @@ async def get_zip_code_data(zip_code: str):
 
 @app.post("/match", response_model=List[MatchedZipCode])
 async def match_city(city: str):
-    return []
+    matched_zip_codes = search_trie(TRIE, city)
+    matched_zip_codes.sort(key=lambda x: x.score)
+    return matched_zip_codes[:NUM_CITY_MATCHES]

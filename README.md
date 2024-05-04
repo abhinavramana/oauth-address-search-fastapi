@@ -42,9 +42,14 @@ The 2 endpoints that are available are:
 You can also access the FastAPI automatic documentation by visiting http://localhost:8000/docs in your web browser. It provides an interactive interface to explore and test the API endpoints.
 
 ## Code structure
+**Python files:**
+1. `application.py` contains the main logic to start anything. The `zip_code` and `match` functions are the main functions that handle the API requests and are in application.py : The `zip_code` function retrieves the data for a specific zip code, while the `match` function matches a city name and retrieves the top 3 closest zip codes.
+3. `config.py` is used to store the configuration settings for the application.
+4. `trie_node.py` is used to define the TrieNode class which is used to store the zip code data in a trie data structure.
+5. `bootup.py` is used to load the data from the csv file and store it in a optimized data structures. This is then used in the `application.py` file to retrieve the data.
+6. `models.py` is used to define the data models for the API requests and responses.
 
-As you can see, the code is structured in a way that the main logic is in the `application.py` file. 
-The `zips.csv` file is read and stored in a dictionary for easy access. 
-The `zip_code` and `match` functions are the main functions that handle the API requests and are in application.py : The `zip_code` function retrieves the data for a specific zip code, while the `match` function matches a city name and retrieves the top 3 closest zip codes.
-`bootup.py` is used to load the data from the csv file and store it in a optimized data structures. This is then used in the `application.py` file to retrieve the data.
-`models.py` is used to define the data models for the API requests and responses.
+**Other files:**
+1. `requirements.txt` contains the dependencies required for the application.
+2. `README.md` contains the instructions for running the application and testing the API endpoints. 
+3. `zips.csv` file is read and stored in a dictionary for easy access. 
