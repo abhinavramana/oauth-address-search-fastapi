@@ -21,7 +21,7 @@ From here on, all instructions will be based on the assumption that you have met
 
 Open a terminal or command prompt, and run the following command to start the FastAPI server:
 ```bash
-uvicorn fastapi:app --reload --timeout 300
+uvicorn application:app --reload
 ```
 
 ## Testing the application
@@ -42,8 +42,8 @@ You can also access the FastAPI automatic documentation by visiting http://local
 
 ## Code structure
 
-As you can see, the code is structured in a way that the main logic is in the `fastapi.py` file. 
+As you can see, the code is structured in a way that the main logic is in the `application.py` file. 
 The `zips.csv` file is read and stored in a dictionary for easy access. 
-The `zip_code` and `match` functions are the main functions that handle the API requests and are in fastapi.py : The `zip_code` function retrieves the data for a specific zip code, while the `match` function matches a city name and retrieves the top 3 closest zip codes.
-`bootup.py` is used to load the data from the csv file and store it in a optimized data structures. This is then used in the `fastapi.py` file to retrieve the data.
+The `zip_code` and `match` functions are the main functions that handle the API requests and are in application.py : The `zip_code` function retrieves the data for a specific zip code, while the `match` function matches a city name and retrieves the top 3 closest zip codes.
+`bootup.py` is used to load the data from the csv file and store it in a optimized data structures. This is then used in the `application.py` file to retrieve the data.
 `models.py` is used to define the data models for the API requests and responses.

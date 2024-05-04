@@ -5,11 +5,14 @@ import logging
 
 from models import MatchedZipCode
 
-logging.info("Performing bootup...")
-perform_bootup()
-logging.info("Starting FastAPI...")
 app = FastAPI()
 logging.info("API ready to serve requests...")
+
+
+@app.on_event("startup")
+async def startup_event():
+    logging.info("Performing bootup...")
+    await perform_bootup("zips.csv")
 
 
 @app.get("/zip/{zip_code}")
