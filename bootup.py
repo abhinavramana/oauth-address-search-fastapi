@@ -4,12 +4,11 @@ import logging
 
 from models import ZipCodeData
 
-zip_code_data = {}
+ZIP_CODE_DATA = {}
 
 
 async def perform_bootup():
-    logging.info("Performing bootup...")
-    with open("zips (copy).csv", "r") as file:
+    with open("zips.csv", "r") as file:
         reader = csv.reader(file)
         for row in reader:
             zip_code = row[0]
@@ -19,7 +18,7 @@ async def perform_bootup():
             county = row[4]
             latitude = float(row[5])
             longitude = float(row[6])
-            zip_code_data[zip_code] = ZipCodeData(
+            ZIP_CODE_DATA[zip_code] = ZipCodeData(
                 zip_code=zip_code,
                 city=city,
                 state=state,
