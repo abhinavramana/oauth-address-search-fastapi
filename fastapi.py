@@ -9,6 +9,7 @@ logging.info("Starting FastAPI...")
 app = FastAPI()
 logging.info("API ready to serve requests...")
 
+
 @app.get("/zip/{zip_code}")
 async def get_zip_code_data(zip_code: str):
     if zip_code in zip_code_data:

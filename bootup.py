@@ -2,10 +2,7 @@
 import csv
 import logging
 
-
-
-
-
+from models import ZipCodeData
 
 zip_code_data = {}
 
