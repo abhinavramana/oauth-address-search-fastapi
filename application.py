@@ -1,11 +1,11 @@
-from bootup import ZIP_CODE_DATA, perform_bootup, TRIE
+from bootup import ZIP_CODE_DATA, perform_bootup, TRIE, ZIP_CODE_TO_CITY_MAP
 from fastapi import FastAPI
 from typing import List
 import logging
-
+from rapidfuzz import process, fuzz
 from config import ZIP_CSV_FILE, NUM_CITY_MATCHES
-from models import MatchedZipCode, SortedCityMatch
-from trie_node import search_trie
+from models import SortedCityMatch, ZipCodeData
+
 
 app = FastAPI()
 logger = logging.getLogger("uvicorn")
@@ -28,8 +28,15 @@ async def get_zip_code_data(zip_code: str):
         return {"message": "Zip code not found"}
 
 
-@app.post("/match", response_model=List[MatchedZipCode])
+@app.post("/match", response_model=List[ZipCodeData])
 async def match_city(sorted_city: SortedCityMatch):
-    matched_zip_codes = search_trie(TRIE, sorted_city.city)
-    matched_zip_codes.sort(key=lambda x: x.score)
-    return matched_zip_codes[:NUM_CITY_MATCHES]
+    # Perform fuzzy search on city names
+    results = process.extract(sorted_city.city, ZIP_CODE_TO_CITY_MAP, scorer=fuzz.WRatio, limit=NUM_CITY_MATCHES)
+    matched_zips = []
+    # Map results back to zip codes and retrieve full data
+    for city, score, zip_code in results:
+        full_city = ZIP_CODE_DATA[zip_code]
+        temp_dict_to_not_modify_original = full_city.dict()
+        temp_dict_to_not_modify_original["score"] = score
+        matched_zips.append(ZipCodeData(**temp_dict_to_not_modify_original))
+    return matched_zips

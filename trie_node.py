@@ -1,47 +1,41 @@
-from models import MatchedZipCode
-
-
 class TrieNode:
     def __init__(self):
-        """
-        to represent each node in the trie.
-        Each node contains a dictionary of its children nodes, a flag indicating if it's the end of a city name, and a list of associated zip code data.
-        """
         self.children = {}
-        self.is_end = False
+        self.is_end_of_word = False
         self.zip_codes = []
 
 
-def add_to_trie(trie: TrieNode, city, zip_code_data):
-    """
-    insert city names and their corresponding zip code data into the trie structure.
-    """
-    node = trie
-    for char in city.lower():
-        if char not in node.children:
-            node.children[char] = TrieNode()
-        node = node.children[char]
-    node.is_end = True
-    node.zip_codes.append(zip_code_data)
+class Trie:
+    def __init__(self):
+        self.root = TrieNode()
 
+    def insert(self, word, zip_code):
+        node = self.root
+        for char in word.lower():
+            if char not in node.children:
+                node.children[char] = TrieNode()
+            node = node.children[char]
+        node.is_end_of_word = True
+        node.zip_codes.append(zip_code)
 
-def search_trie(trie: TrieNode, city: str):
-    """
-    performs a prefix search on the trie based on the input city name. It returns a list of MatchedZipCode instances, where the score represents the length of the matching prefix.
-    """
-    node = trie
-    for char in city.lower():
-        if char not in node.children:
-            return []
-        node = node.children[char]
+    def search(self, word: str, max_results: int):
+        node = self.root
+        for char in word.lower():
+            if char in node.children:
+                node = node.children[char]
+            else:
+                return []
 
-    def dfs(node, score):
+        # Find all words under this prefix
         results = []
-        if node.is_end:
-            for zip_code_data in node.zip_codes:
-                results.append(MatchedZipCode(score=score, **zip_code_data.dict()))
-        for char in node.children:
-            results.extend(dfs(node.children[char], score + 1))
+        self._dfs(node, word, results)
+        results = sorted(results, key=lambda x: (-x[1], x[0]))[:max_results]
         return results
 
-    return dfs(node, 0)
+    def _dfs(self, node, prefix, results):
+        if node.is_end_of_word:
+            for zip_code in node.zip_codes:
+                # Simulate a score based on how exact the match is, for now just using length of prefix
+                results.append((zip_code, len(prefix)))
+        for char, child in node.children.items():
+            self._dfs(child, prefix + char, results)

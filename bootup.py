@@ -1,16 +1,17 @@
-
 import csv
 import logging
-from models import ZipCodeData
-from trie_node import add_to_trie, TrieNode
+from typing import Dict
 
+from models import ZipCodeData
+from trie_node import Trie
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-ZIP_CODE_DATA = {}
-TRIE = TrieNode()
+ZIP_CODE_DATA: Dict[int, ZipCodeData] = {}
+ZIP_CODE_TO_CITY_MAP: Dict[int, str] = {}
+TRIE = Trie()
 
 
 def process_record(row):
@@ -30,8 +31,9 @@ def process_record(row):
         latitude=latitude,
         longitude=longitude,
     )
+    ZIP_CODE_TO_CITY_MAP[zip_code] = city
     logger.info(f"Adding {city} to trie")
-    add_to_trie(TRIE, city, ZIP_CODE_DATA[zip_code])
+    TRIE.insert(city, zip_code)
 
 
 async def perform_bootup(filename: str):

@@ -2,17 +2,14 @@ from pydantic import BaseModel
 
 
 class ZipCodeData(BaseModel):
-    zip_code: str
+    zip_code: int
     city: str
     state: str
     state_code: str
     county: str
     latitude: float
     longitude: float
-
-
-class MatchedZipCode(ZipCodeData):
-    score: int
+    score: float = 0.0  # Default score for the exact match case
 
 
 class SortedCityMatch(BaseModel):
