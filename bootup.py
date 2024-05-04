@@ -7,6 +7,7 @@ ZIP_CODE_DATA = {}
 
 logger = logging.getLogger(__name__)
 
+
 def process_record(row):
     zip_code = row[0]
     city = row[1]

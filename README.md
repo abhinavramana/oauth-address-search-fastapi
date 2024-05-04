@@ -8,7 +8,8 @@ This initializes a FASTAPI instance for searching zip codes
 pip --version
 ```
 If not installed, follow instructions here: [pip installation](https://pip.pypa.io/en/stable/installation/)
-3. Make sure you have FastAPI and its dependencies installed. You can install them using pip:
+3. (Optional but recommended) You should be in a virtual environment to not cause conflicts in your OS: https://python.land/virtual-environments/virtualenv
+4. Make sure you have FastAPI and its dependencies installed. You can install them using pip:
 ```bash
 pip install -r requirements.txt
 ```
