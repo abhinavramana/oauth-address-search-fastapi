@@ -1,17 +1,17 @@
-from bootup import ZIP_CODE_DATA, perform_bootup, TRIE, ZIP_CODE_TO_CITY_MAP
+from bootup import ZIP_CODE_DATA, perform_bootup, ZIP_CODE_TO_CITY_MAP
 from typing import List
 import logging
 from rapidfuzz import process, fuzz
-from config import ZIP_CSV_FILE, NUM_CITY_MATCHES
+from config import ZIP_CSV_FILE, NUM_CITY_MATCHES, OKTA_ISSUER, OKTA_AUDIENCE, CLIENT_ID, CLIENT_SECRET
 from logging_configuration import add_json_config_to_logger
 from models import SortedCityMatch, ZipCodeData
 from jose import jwt
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import FastAPI, Depends, HTTPException
-from fastapi.security import OAuth2PasswordBearer
-from okta_jwt.jwt import validate_token
+
 from okta_jwt.jwt import generate_token
 
+from oauth_config import get_current_user
 
 app = FastAPI()
 
@@ -27,34 +27,13 @@ async def startup_event():
     await perform_bootup(ZIP_CSV_FILE)
 
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
-OKTA_ISSUER = "https://dev-hqlhngnge6hgtx5t.us.auth0.com/oauth2/default"  # Replace with your Okta domain
-OKTA_AUDIENCE = "https://dev-hqlhngnge6hgtx5t.us.auth0.com/api/v2/" # api://default"  # Replace with your Okta audience if different
-CLIENT_ID = "DpV7Bgqblt7B3ahwMWZWlsbqr5ashQ8N"
-CLIENT_SECRET = "jevIA2CHAZrFv1jnD1jnhAjsq2BmFgpjeXl0cOzIgMxBDvBuz4DJeeABGIZ4ogSE"
-AUDIENCE = "https://dev-hqlhngnge6hgtx5t.us.auth0.com/api/v2/"
-
-
-async def get_current_user(token: str = Depends(oauth2_scheme)):
-    try:
-        claims = validate_token(token, OKTA_ISSUER, OKTA_AUDIENCE, [CLIENT_ID])
-        username = claims.get("sub")
-        if username is None:
-            raise HTTPException(status_code=401, detail="Invalid authentication credentials")
-        return username
-    except Exception as e:
-        raise HTTPException(status_code=401, detail=str(e))
-
-
-
 @app.post("/token")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     try:
         token = generate_token(OKTA_ISSUER, CLIENT_ID, CLIENT_SECRET,
-            form_data.username,
-            form_data.password,
-        )
+                               form_data.username,
+                               form_data.password,
+                               )
         return {"access_token": token, "token_type": "bearer"}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
