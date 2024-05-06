@@ -4,7 +4,7 @@ import logging
 from rapidfuzz import process, fuzz
 from config import ZIP_CSV_FILE, NUM_CITY_MATCHES, OKTA_ISSUER, OKTA_AUDIENCE, CLIENT_ID, CLIENT_SECRET
 from logging_configuration import add_json_config_to_logger
-from models import SortedCityMatch, ZipCodeData
+from models import SortedCityMatch, ZipCodeData, LoginData
 from jose import jwt
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import FastAPI, Depends, HTTPException
@@ -28,7 +28,7 @@ async def startup_event():
 
 
 @app.post("/token")
-async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+async def login(form_data: LoginData):
     try:
         token = generate_token(OKTA_ISSUER, CLIENT_ID, CLIENT_SECRET,
                                form_data.username,
@@ -70,6 +70,7 @@ async def log_requests(request, call_next):
         }
         logger.info(log_data)
     return response
+
 
 @app.get("/zip/{zip_code}")
 async def get_zip_code_data(zip_code: str, current_user: str = Depends(get_current_user)):

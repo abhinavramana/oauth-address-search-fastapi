@@ -34,6 +34,10 @@ The 2 endpoints that are available are:
 ```bash
 curl -X POST -H "Content-Type: application/json" -d '{"city": "Cheyenne"}' http://localhost:8002/match
 ```
+Generate Oath token
+```bash
+curl  -X POST -H "Content-Type: application/json" -d '{"username": "username", "password": "password"}' http://localhost:8002/token
+```
 
 ## Auto-generated API documentation
 
