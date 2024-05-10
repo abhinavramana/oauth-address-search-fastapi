@@ -15,21 +15,32 @@ pip install -r requirements.txt
 ```
 4. Ensure you have a working internet connection to download the dependencies.
 5. There is a zips.csv already provided in the repository. This is the file that will be used to search for zip codes. You can replace this file with your own file, but ensure that the file is in the same format as the provided file.
-
+6. You should have ngrok also setup:
+```bash
+sudo snap install ngrok
+ngrok config add-authtoken 27L4iB5bEaVrVAjGGfbSm3Y66mx_87PTQfbACYATiLRSsMHPJ
+```
 From here on, all instructions will be based on the assumption that you have met the above prerequisites and you are Running Linux (ubuntu) environment.
 
-## Running the application
+## Getting Started
 
-Open a terminal or command prompt, and run the following command to start the FastAPI server:
+1. Open a terminal or command prompt, and run the following command to start the FastAPI server:
 ```bash
 uvicorn application:app --reload --log-level info --port 8002
 ```
-
+2. Use another terminal and ngrok to expose the server to the internet:
+```bash
+ngrok http 8002 --domain budidamatrixinc.ngrok-free.app
+```
 ## Testing the application
 
 Once the server is running, you can access the API endpoints using a tool like cURL or by sending HTTP requests from your application.
 The 2 endpoints that are available are:
 1. To retrieve zip code data for a specific zip code, send a GET request to http://localhost:8002/zip/{zip_code}, replacing {zip_code} with the desired zip code.
+```bash
+curl http://localhost:8002/zip/82007
+curl https://budidamatrixinc.ngrok-free.app/zip/82007
+```
 2. To match a city name and retrieve the top 3 closest zip codes, send a POST request to http://localhost:8002/match with a JSON payload containing the city field. For example:
 ```bash
 curl -X POST -H "Content-Type: application/json" -d '{"city": "Cheyenne"}' http://localhost:8002/match
