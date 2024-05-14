@@ -6,7 +6,6 @@ from config import ZIP_CSV_FILE, NUM_CITY_MATCHES, OKTA_ISSUER, OKTA_AUDIENCE, C
 from logging_configuration import add_json_config_to_logger
 from models import SortedCityMatch, ZipCodeData, LoginData
 from jose import jwt
-from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import FastAPI, Depends, HTTPException
 
 from okta_jwt.jwt import generate_token
@@ -25,18 +24,6 @@ logger.info("API ready to serve requests...")
 async def startup_event():
     logger.info("Performing bootup...")
     await perform_bootup(ZIP_CSV_FILE)
-
-
-@app.post("/token")
-async def login(form_data: LoginData):
-    try:
-        token = generate_token(OKTA_ISSUER, CLIENT_ID, CLIENT_SECRET,
-                               form_data.username,
-                               form_data.password,
-                               )
-        return {"access_token": token, "token_type": "bearer"}
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
 
 
 @app.middleware("http")
@@ -72,6 +59,16 @@ async def log_requests(request, call_next):
     return response
 
 
+@app.post("/token")
+async def login(form_data: LoginData):
+    try:
+        token = generate_token(OKTA_ISSUER, CLIENT_ID, CLIENT_SECRET, form_data.username, form_data.password)
+        return {"access_token": token, "token_type": "bearer"}
+    except Exception as e:
+        logger.error(f"Error generating token: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=404, detail=f"username {form_data.username} not found due to {str(e)}")
+
+
 @app.get("/zip/{zip_code}")
 async def get_zip_code_data(zip_code: str, current_user: str = Depends(get_current_user)):
     if zip_code in ZIP_CODE_DATA:
@@ -92,3 +89,8 @@ async def match_city(sorted_city: SortedCityMatch):
         temp_dict_to_not_modify_original["score"] = score
         matched_zips.append(ZipCodeData(**temp_dict_to_not_modify_original))
     return matched_zips
+
+
+@app.get("/")
+async def homepage():
+    return {"docs": "https://budidamatrixinc.ngrok-free.app/docs"}

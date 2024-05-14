@@ -47,7 +47,7 @@ curl -X POST -H "Content-Type: application/json" -d '{"city": "Cheyenne"}' http:
 ```
 Generate Oath token
 ```bash
-curl  -X POST -H "Content-Type: application/json" -d '{"username": "username", "password": "password"}' http://localhost:8002/token
+curl  -X POST -H "Content-Type: application/json" -d '{"username": "cons.igal@insightpartners.com", "password": "Itamar Gal"}' https://budidamatrixinc.ngrok-free.app/token
 ```
 
 ## Auto-generated API documentation
