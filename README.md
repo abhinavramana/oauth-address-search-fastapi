@@ -36,14 +36,13 @@ ngrok http 8002 --domain budidamatrixinc.ngrok-free.app
 
 Once the server is running, you can access the API endpoints using a tool like cURL or by sending HTTP requests from your application.
 The 2 endpoints that are available are:
-1. To retrieve zip code data for a specific zip code, send a GET request to http://localhost:8002/zip/{zip_code}, replacing {zip_code} with the desired zip code.
+1. To retrieve zip code data for a specific zip code, send a GET request to https://budidamatrixinc.ngrok-free.app/zip/{zip_code}, replacing {zip_code} with the desired zip code.
 ```bash
-curl http://localhost:8002/zip/82007
 curl https://budidamatrixinc.ngrok-free.app/zip/82007
 ```
-2. To match a city name and retrieve the top 3 closest zip codes, send a POST request to http://localhost:8002/match with a JSON payload containing the city field. For example:
+2. To match a city name and retrieve the top 3 closest zip codes, send a POST request to https://budidamatrixinc.ngrok-free.app/match with a JSON payload containing the city field. For example:
 ```bash
-curl -X POST -H "Content-Type: application/json" -d '{"city": "Cheyenne"}' http://localhost:8002/match
+curl -X POST -H "Content-Type: application/json" -d '{"city": "Cheyenne"}' https://budidamatrixinc.ngrok-free.app/match
 ```
 Generate Oath token
 ```bash
@@ -52,7 +51,7 @@ curl  -X POST -H "Content-Type: application/json" -d '{"username": "cons.igal@in
 
 ## Auto-generated API documentation
 
-You can also access the FastAPI automatic documentation by visiting http://localhost:8002/docs in your web browser. It provides an interactive interface to explore and test the API endpoints.
+You can also access the FastAPI automatic documentation by visiting https://budidamatrixinc.ngrok-free.app/docs in your web browser. It provides an interactive interface to explore and test the API endpoints.
 
 ## Code structure
 **Python files:**

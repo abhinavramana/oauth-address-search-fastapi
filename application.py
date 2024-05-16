@@ -2,7 +2,7 @@ from bootup import ZIP_CODE_DATA, perform_bootup, ZIP_CODE_TO_CITY_MAP
 from typing import List
 import logging
 from rapidfuzz import process, fuzz
-from config import ZIP_CSV_FILE, NUM_CITY_MATCHES, OKTA_ISSUER, OKTA_AUDIENCE, CLIENT_ID, CLIENT_SECRET
+from config import ZIP_CSV_FILE, NUM_CITY_MATCHES, AUTH0_DOMAIN, AUTH0_AUDIENCE, CLIENT_SECRET, CLIENT_ID
 from logging_configuration import add_json_config_to_logger
 from models import SortedCityMatch, ZipCodeData, LoginData
 from jose import jwt
@@ -59,14 +59,30 @@ async def log_requests(request, call_next):
     return response
 
 
+import requests
+from fastapi import HTTPException
+
+
 @app.post("/token")
 async def login(form_data: LoginData):
     try:
-        token = generate_token(OKTA_ISSUER, CLIENT_ID, CLIENT_SECRET, form_data.username, form_data.password)
-        return {"access_token": token, "token_type": "bearer"}
+        token_url = f"https://{AUTH0_DOMAIN}/oauth/token"
+        payload = {
+            "grant_type": "password",
+            "username": form_data.username,
+            "password": form_data.password,
+            "audience": AUTH0_AUDIENCE,
+            "client_id": CLIENT_ID,
+            "client_secret": CLIENT_SECRET,
+        }
+        response = requests.post(token_url, json=payload)
+        response.raise_for_status()
+        token_data = response.json()
+        access_token = token_data["access_token"]
+        return {"access_token": access_token, "token_type": "bearer"}
     except Exception as e:
         logger.error(f"Error generating token: {str(e)}", exc_info=True)
-        raise HTTPException(status_code=404, detail=f"username {form_data.username} not found due to {str(e)}")
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @app.get("/zip/{zip_code}")

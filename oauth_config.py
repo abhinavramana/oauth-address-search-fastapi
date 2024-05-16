@@ -1,15 +1,15 @@
+from jose import jwt
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
-from okta_jwt.jwt import validate_token
 
-from config import OKTA_ISSUER, OKTA_AUDIENCE, CLIENT_ID
+from config import CLIENT_SECRET, AUTH0_AUDIENCE, AUTH0_ISSUER
 
 OAUTH2_SCHEME = OAuth2PasswordBearer(tokenUrl="token")
 
 
 async def get_current_user(token: str = Depends(OAUTH2_SCHEME)):
     try:
-        claims = validate_token(token, OKTA_ISSUER, OKTA_AUDIENCE, [CLIENT_ID])
+        claims = jwt.decode(token, CLIENT_SECRET, algorithms=["HS256"], audience=AUTH0_AUDIENCE, issuer=AUTH0_ISSUER)
         username = claims.get("sub")
         if username is None:
             raise HTTPException(status_code=401, detail="Invalid authentication credentials")
