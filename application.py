@@ -1,14 +1,16 @@
+import httpx
+
 from bootup import ZIP_CODE_DATA, perform_bootup, ZIP_CODE_TO_CITY_MAP
 from typing import List
 import logging
 from rapidfuzz import process, fuzz
-from config import ZIP_CSV_FILE, NUM_CITY_MATCHES, AUTH0_DOMAIN, AUTH0_AUDIENCE, CLIENT_SECRET, CLIENT_ID
+from config import ZIP_CSV_FILE, NUM_CITY_MATCHES, AUTH0_DOMAIN, AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET
 from logging_configuration import add_json_config_to_logger
 from models import SortedCityMatch, ZipCodeData, LoginData
 from jose import jwt
 from fastapi import FastAPI, Depends, HTTPException
 import requests
-from oauth_config import get_current_user
+from oauth_config import get_current_user, get_token, CurrentUser
 
 app = FastAPI()
 
@@ -58,33 +60,13 @@ async def log_requests(request, call_next):
 
 
 @app.post("/token")
-async def login(form_data: LoginData):
-    try:
-        token_url = f"https://{AUTH0_DOMAIN}/oauth/token"
-        payload = {
-            "grant_type": "password",
-            "username": form_data.username,
-            "password": form_data.password,
-            "audience": AUTH0_AUDIENCE,
-            "client_id": CLIENT_ID,
-            "client_secret": CLIENT_SECRET,
-        }
-        headers = {"content-type": "application/x-www-form-urlencoded"}
-        response = requests.post(token_url, data=payload, headers=headers)
-        response.raise_for_status()
-        token_data = response.json()
-        access_token = token_data["access_token"]
-        return {"access_token": access_token, "token_type": "bearer"}
-    except requests.exceptions.HTTPError as e:
-        logger.error(f"Error generating token: {str(e)}", exc_info=True)
-        raise HTTPException(status_code=e.response.status_code, detail=str(e))
-    except Exception as e:
-        logger.error(f"Error generating token: {str(e)}", exc_info=True)
-        raise HTTPException(status_code=400, detail=str(e))
+async def login(form_data: LoginData) -> str:
+    return await get_token(form_data.username, form_data.password)
 
 
 @app.get("/zip/{zip_code}")
-async def get_zip_code_data(zip_code: str, current_user: str = Depends(get_current_user)):
+async def get_zip_code_data(zip_code: int, current_user: CurrentUser = Depends(get_current_user)):
+    logger.info(f"User {current_user.username} with email: {current_user.email} requested data for zip code {zip_code}")
     if zip_code in ZIP_CODE_DATA:
         return ZIP_CODE_DATA[zip_code]
     else:
