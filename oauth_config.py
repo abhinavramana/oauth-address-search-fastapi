@@ -6,9 +6,8 @@ from authlib.jose import JsonWebToken
 from authlib.jose.errors import JoseError
 import httpx
 
-from config import OKTA_JWKS_URI, OKTA_ISSUER, AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET, AUTH0_DOMAIN
-
-TOKEN_URL = f"https://{AUTH0_DOMAIN}/oauth/token"
+from config import OKTA_JWKS_URI, OKTA_ISSUER, AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET, TOKEN_URL, AUTH0_AUDIENCE, \
+    AUTH0_AUDIENCE_2
 
 
 class CurrentUser(BaseModel):
@@ -49,7 +48,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Security(
 
 
 async def get_token(username: str, password: str) -> str:
-    """Get a bearer token from Okta using username and password."""
+    """Get a bearer token using username and password."""
     headers = {
         'Content-Type': 'application/x-www-form-urlencoded'
     }
@@ -59,10 +58,22 @@ async def get_token(username: str, password: str) -> str:
         'password': password,
         'client_id': AUTH0_CLIENT_ID,
         'client_secret': AUTH0_CLIENT_SECRET,
-        'scope': 'openid profile email'  # Specify the scopes you need
+        'audience': AUTH0_AUDIENCE,
+        # 'audience': AUTH0_AUDIENCE_2
+        'scope': 'openid profile email'  # Optional scopes as needed
     }
 
     async with httpx.AsyncClient() as client:
-        response = await client.post(TOKEN_URL, headers=headers, data=payload)
-        response.raise_for_status()
-        return response.json()["access_token"]
+        try:
+            response = await client.post(TOKEN_URL, headers=headers, data=payload)
+            response.raise_for_status()
+            return response.json()["access_token"]
+        except httpx.HTTPStatusError as e:
+            # Log full error information
+            error_response = e.response.json()
+            error_description = error_response.get("error_description", error_response.get("message", "Unknown error"))
+            raise HTTPException(status_code=e.response.status_code,
+                                detail=f"HTTP error {e.response.status_code}: {error_description}")
+        except httpx.RequestError as e:
+            # Log client errors like network issues
+            raise HTTPException(status_code=500, detail=f"Request error: {str(e)}")

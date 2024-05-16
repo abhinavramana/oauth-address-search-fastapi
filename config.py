@@ -6,3 +6,7 @@ AUTH0_CLIENT_SECRET = "jevIA2CHAZrFv1jnD1jnhAjsq2BmFgpjeXl0cOzIgMxBDvBuz4DJeeABG
 AUTH0_DOMAIN = "dev-hqlhngnge6hgtx5t.us.auth0.com"
 OKTA_ISSUER = f"https://{AUTH0_DOMAIN}/"
 OKTA_JWKS_URI = f"https://{AUTH0_DOMAIN}/.well-known/jwks.json"
+AUTH0_AUDIENCE = "https://budidamatrixinc.ngrok-free.app"
+AUTH0_AUDIENCE_2 = "https://dev-hqlhngnge6hgtx5t.us.auth0.com/api/v2/"
+TOKEN_URL = f"https://{AUTH0_DOMAIN}/oauth/token"
+

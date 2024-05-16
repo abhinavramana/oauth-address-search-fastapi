@@ -61,7 +61,18 @@ async def log_requests(request, call_next):
 
 @app.post("/token")
 async def login(form_data: LoginData) -> str:
-    return await get_token(form_data.username, form_data.password)
+    try:
+        token = await get_token(form_data.username, form_data.password)
+    except httpx.HTTPStatusError as e:
+        logger.error(f"Error getting token: {e.response.text}", exc_info=True)
+        raise HTTPException(
+            status_code=e.response.status_code,
+            detail=e.response.json().get("error_description", e.response.text)
+        )
+    return token
+
+
+
 
 
 @app.get("/zip/{zip_code}")
