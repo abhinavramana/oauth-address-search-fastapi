@@ -1,5 +1,5 @@
 from typing import Dict, Any
-from fastapi import FastAPI, HTTPException, Security
+from fastapi import HTTPException, Security
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
 from authlib.jose import JsonWebToken
@@ -58,22 +58,14 @@ async def get_token(username: str, password: str) -> str:
         'password': password,
         'client_id': AUTH0_CLIENT_ID,
         'client_secret': AUTH0_CLIENT_SECRET,
-        'audience': AUTH0_AUDIENCE,
-        # 'audience': AUTH0_AUDIENCE_2
+        # 'audience': AUTH0_AUDIENCE,
+        'audience': AUTH0_AUDIENCE_2,
         'scope': 'openid profile email'  # Optional scopes as needed
     }
 
     async with httpx.AsyncClient() as client:
-        try:
-            response = await client.post(TOKEN_URL, headers=headers, data=payload)
-            response.raise_for_status()
-            return response.json()["access_token"]
-        except httpx.HTTPStatusError as e:
-            # Log full error information
-            error_response = e.response.json()
-            error_description = error_response.get("error_description", error_response.get("message", "Unknown error"))
-            raise HTTPException(status_code=e.response.status_code,
-                                detail=f"HTTP error {e.response.status_code}: {error_description}")
-        except httpx.RequestError as e:
-            # Log client errors like network issues
-            raise HTTPException(status_code=500, detail=f"Request error: {str(e)}")
+        response = await client.post(TOKEN_URL, headers=headers, data=payload)
+        result = response.json()
+        if response.status_code != 200:
+            raise HTTPException(status_code=response.status_code, detail=result)
+        return result["access_token"]
