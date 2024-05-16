@@ -9,7 +9,7 @@ OAUTH2_SCHEME = OAuth2PasswordBearer(tokenUrl="token")
 
 async def get_current_user(token: str = Depends(OAUTH2_SCHEME)):
     try:
-        claims = jwt.decode(token, CLIENT_SECRET, algorithms=["HS256"], audience=AUTH0_AUDIENCE, issuer=AUTH0_ISSUER)
+        claims = jwt.decode(token, CLIENT_SECRET, audience=AUTH0_AUDIENCE, issuer=AUTH0_ISSUER)
         username = claims.get("sub")
         if username is None:
             raise HTTPException(status_code=401, detail="Invalid authentication credentials")

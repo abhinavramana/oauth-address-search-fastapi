@@ -7,9 +7,7 @@ from logging_configuration import add_json_config_to_logger
 from models import SortedCityMatch, ZipCodeData, LoginData
 from jose import jwt
 from fastapi import FastAPI, Depends, HTTPException
-
-from okta_jwt.jwt import generate_token
-
+import requests
 from oauth_config import get_current_user
 
 app = FastAPI()
@@ -59,10 +57,6 @@ async def log_requests(request, call_next):
     return response
 
 
-import requests
-from fastapi import HTTPException
-
-
 @app.post("/token")
 async def login(form_data: LoginData):
     try:
@@ -75,11 +69,15 @@ async def login(form_data: LoginData):
             "client_id": CLIENT_ID,
             "client_secret": CLIENT_SECRET,
         }
-        response = requests.post(token_url, json=payload)
+        headers = {"content-type": "application/x-www-form-urlencoded"}
+        response = requests.post(token_url, data=payload, headers=headers)
         response.raise_for_status()
         token_data = response.json()
         access_token = token_data["access_token"]
         return {"access_token": access_token, "token_type": "bearer"}
+    except requests.exceptions.HTTPError as e:
+        logger.error(f"Error generating token: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=e.response.status_code, detail=str(e))
     except Exception as e:
         logger.error(f"Error generating token: {str(e)}", exc_info=True)
         raise HTTPException(status_code=400, detail=str(e))
