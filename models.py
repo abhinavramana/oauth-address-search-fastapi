@@ -1,6 +1,11 @@
 from pydantic import BaseModel
 
 
+class LoginData(BaseModel):
+    username: str
+    password: str
+
+
 class ZipCodeData(BaseModel):
     zip_code: int
     city: str
